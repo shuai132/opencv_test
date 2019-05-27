@@ -15,7 +15,11 @@ using namespace cv;
 
 int main() {
     Mat srcImage = imread("test.png");
-    imshow("1. srcImage", srcImage);
+    imshow("1.1 srcImage", srcImage);
+
+    Mat srcImage2 = srcImage.clone();
+    circle(srcImage2, Point(MID_POINT_X, MID_POINT_Y), 3, Scalar(255,255,255), -1);
+    imshow("1.2 srcImage2", srcImage2);
 
     // 只取标定点区域图像处理即可
     Mat roiImage = srcImage(Rect(0, MID_POINT_Y - MORE_POINT, srcImage.cols, MORE_POINT * 2 + 1));
@@ -28,13 +32,15 @@ int main() {
 
     // 边缘检测
     Mat cannyImage;
-    Canny(grayImage, cannyImage, 100, 50, 3);   // 此算法很依赖边缘检测的完整性 需要妥善选择值
+    Canny(grayImage, cannyImage, 50, 50, 3);   // 此算法很依赖边缘检测的完整性 需要妥善选择值
     imshow("3. cannyImage", cannyImage);
 
     //// 认为边缘检测是封闭的图 算平均距离 计算每列中距离标定点最近的左右两个点的距离并取平均
     auto getDistanceOfRow = [](Mat image, int row) {
-        int left = MID_POINT_X;
-        int right = MID_POINT_X;
+        const int NOT_FOUND_VALUE = -1;
+
+        int left = NOT_FOUND_VALUE;
+        int right = NOT_FOUND_VALUE;
 
         auto* data = image.ptr<uchar>(row);
         for(auto i = MID_POINT_X; i >= 0; i--) {
@@ -44,7 +50,7 @@ int main() {
                 break;
             }
         }
-        if (left == MID_POINT_X) goto NOT_FOUND;
+        if (left == NOT_FOUND_VALUE) goto NOT_FOUND;
 
         for(auto i = MID_POINT_X; i < image.cols; i++) {
             auto v = data[i];
@@ -53,7 +59,7 @@ int main() {
                 break;
             }
         }
-        if (right == MID_POINT_X) goto NOT_FOUND;
+        if (right == NOT_FOUND_VALUE) goto NOT_FOUND;
 
         return right - left;
 
