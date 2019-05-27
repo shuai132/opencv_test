@@ -8,36 +8,31 @@
 
 using namespace cv;
 
-// 图片的宽高
-#define IMG_WIDTH       700
-#define IMG_HEIGHT      481
-// 两个边缘之间的任意一点
+// 标定点
 #define MID_POINT_X     245
 #define MID_POINT_Y     250
-//// 为加速处理 只取上述点的附近图像即可(此处取点和上下10个像素的条状区域)
-//#define MORE_POINT      10
 
 int main() {
     Mat srcImage = imread("test.png");
-    // 黑色区域的一个子集
-    Mat roiImage = srcImage;//srcImage(Rect(0, MID_POINT_Y - MORE_POINT, IMG_WIDTH, MORE_POINT * 2 + 1));
-
     imshow("1. srcImage", srcImage);
-    Mat midImage;
 
     // 转为灰度图并进行图像平滑
-    cvtColor(roiImage, midImage, COLOR_BGR2GRAY);
-    GaussianBlur(roiImage, roiImage, Size(9, 9), 2, 2);
-    imshow("2. roiImage", roiImage);
+    Mat grayImage;
+    cvtColor(srcImage, grayImage, COLOR_BGR2GRAY);
+    GaussianBlur(grayImage, grayImage, Size(9, 9), 2, 2);
+    imshow("2. grayImage", grayImage);
 
     // 边缘检测
-    Canny(roiImage, midImage, 100, 100, 3);
+    Mat cannyImage;
+    Canny(grayImage, cannyImage, 100, 100, 3);
+    imshow("3. cannyImage", cannyImage);
+
     // 霍夫线变换
     std::vector<Vec4i> lines;
-    HoughLinesP(midImage, lines, 1, CV_PI, 10, 10, 50);
+    HoughLinesP(cannyImage, lines, 1, CV_PI, 10, 10, 50);
 
     //// 找离参照点左右分别最近的竖线
-    // 1. x轴位置排序
+    // x轴位置排序
     std::sort(lines.begin(), lines.end(), [](Vec4i v1, Vec4i v2) {
         return v1[0] < v2[0];
     });
@@ -50,7 +45,7 @@ int main() {
         return y1 < MID_POINT_Y && y2 > MID_POINT_Y;
     };
 
-    // 2. 找出左右相邻
+    // 找出左右相邻
     {
         int left = 0;
         int right = 0;
@@ -72,19 +67,19 @@ int main() {
         }
     }
 
+    //// 可视化效果
+    Mat outImage = srcImage.clone();
+    // 绘制预设点
+    circle(outImage, Point(MID_POINT_X, MID_POINT_Y), 5, Scalar(255,255,255), -1);
     // 在图中绘制出每条线段
     for (auto l : lines) {
-        printf("%s: x: %d, y: %d x2: %d, y2: %d\n", isUsefulLine(l) ? "Good:" : "Bad:", l[0], l[1], l[2], l[3]);
+        //printf("%s: x: %d, y: %d x2: %d, y2: %d\n", isUsefulLine(l) ? "Good:" : "Bad:", l[0], l[1], l[2], l[3]);
 
         Scalar greenColor = Scalar(0,255,0);
         Scalar redColor = Scalar(0,0,255);
-        line(roiImage, Point(l[0], l[1]), Point(l[2], l[3]), isUsefulLine(l) ? greenColor : redColor, 1, LINE_AA);
-        //此句代码的OpenCV2版为：
-        //line( dstImage, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(186,88,255), 1, CV_AA);
+        line(outImage, Point(l[0], l[1]), Point(l[2], l[3]), isUsefulLine(l) ? greenColor : redColor, 1, LINE_AA);
     }
-    circle(roiImage, Point(MID_POINT_X, MID_POINT_Y), 5, Scalar(255,255,255), -1);
-    imshow("3. midImage", midImage);
-    imshow("4. lineImage", roiImage);
+    imshow("4. lineImage", outImage);
 
     waitKey(0);
     return 0;
