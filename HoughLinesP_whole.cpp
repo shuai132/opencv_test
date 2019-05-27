@@ -11,19 +11,14 @@ using namespace cv;
 // 标定点
 #define MID_POINT_X     245
 #define MID_POINT_Y     250
-// 为加速处理 只取上述点的附近图像即可(此处取点和上下10个像素的条状区域)
-#define MORE_POINT      100
 
 int main() {
     Mat srcImage = imread("test.png");
     imshow("1. srcImage", srcImage);
 
-    // 只取标定点区域图像处理即可
-    Mat roiImage = srcImage(Rect(0, MID_POINT_Y - MORE_POINT, srcImage.rows, MORE_POINT * 2 + 1));
-
     // 转为灰度图并进行图像平滑
     Mat grayImage;
-    cvtColor(roiImage, grayImage, COLOR_BGR2GRAY);
+    cvtColor(srcImage, grayImage, COLOR_BGR2GRAY);
     GaussianBlur(grayImage, grayImage, Size(9, 9), 2, 2);
     imshow("2. grayImage", grayImage);
 
@@ -47,7 +42,7 @@ int main() {
         auto y1 = l[3];
         auto y2 = l[1];
 
-        return y1 < MORE_POINT && y2 > MORE_POINT;
+        return y1 < MID_POINT_Y && y2 > MID_POINT_Y;
     };
 
     // 找出左右相邻
@@ -73,9 +68,9 @@ int main() {
     }
 
     //// 可视化效果
-    Mat outImage = roiImage.clone();
+    Mat outImage = srcImage.clone();
     // 绘制预设点
-    circle(outImage, Point(MID_POINT_X, MORE_POINT), 5, Scalar(255,255,255), -1);
+    circle(outImage, Point(MID_POINT_X, MID_POINT_Y), 5, Scalar(255,255,255), -1);
     // 在图中绘制出每条线段
     for (auto l : lines) {
         //printf("%s: x: %d, y: %d x2: %d, y2: %d\n", isUsefulLine(l) ? "Good:" : "Bad:", l[0], l[1], l[2], l[3]);
