@@ -12,7 +12,7 @@ using namespace cv;
 #define IMG_WIDTH       700
 #define IMG_HEIGHT      481
 // 两个边缘之间的任意一点
-#define MID_POINT_X     250
+#define MID_POINT_X     245
 #define MID_POINT_Y     250
 //// 为加速处理 只取上述点的附近图像即可(此处取点和上下10个像素的条状区域)
 //#define MORE_POINT      10
@@ -82,6 +82,7 @@ int main() {
         //此句代码的OpenCV2版为：
         //line( dstImage, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(186,88,255), 1, CV_AA);
     }
+    circle(roiImage, Point(MID_POINT_X, MID_POINT_Y), 5, Scalar(255,255,255), -1);
     imshow("3. midImage", midImage);
     imshow("4. lineImage", roiImage);
 
