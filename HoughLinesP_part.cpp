@@ -19,7 +19,7 @@ int main() {
     imshow("1. srcImage", srcImage);
 
     // 只取标定点区域图像处理即可
-    Mat roiImage = srcImage(Rect(0, MID_POINT_Y - MORE_POINT, srcImage.rows, MORE_POINT * 2 + 1));
+    Mat roiImage = srcImage(Rect(0, MID_POINT_Y - MORE_POINT, srcImage.cols, MORE_POINT * 2 + 1));
 
     // 转为灰度图并进行图像平滑
     Mat grayImage;
