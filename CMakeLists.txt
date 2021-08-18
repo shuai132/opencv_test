@@ -17,3 +17,7 @@ set(EXEC_NAME Canny_avg)
 add_executable(${EXEC_NAME} ${EXEC_NAME}.cpp)
 target_link_libraries(${EXEC_NAME} ${OpenCV_LIBS})
 
+set(EXEC_NAME oled_absd)
+add_executable(${EXEC_NAME} ${EXEC_NAME}.cpp)
+target_link_libraries(${EXEC_NAME} ${OpenCV_LIBS})
+
