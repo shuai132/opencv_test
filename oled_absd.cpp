@@ -10,8 +10,8 @@
 int main(void)
 {
     GRAY_DEAL();      /* 灰度处理视屏->二值化图像帧->取点 */
-    Pot_buf_deal();   /* 阴码/阳码 */
-    print_file();     /* 格式化输出 */
+//    Pot_buf_deal();   /* 阴码/阳码 */
+//    print_file();     /* 格式化输出 */
 
     cout<<"deal finsh!\n";
     getchar();

@@ -36,7 +36,7 @@ void print_file(void);
 
 /* define */
 #define Filliter(A) (A>127)?1:0
-#define Numbers_of_img  80//处理图片张数，自己修改,要小于最大帧数。例如：示例中的gif读取到的帧数为88，那么这个值设置不能超过88！
+#define Numbers_of_img  9980//处理图片张数，自己修改,要小于最大帧数。例如：示例中的gif读取到的帧数为88，那么这个值设置不能超过88！
 uchar Point_buf[Numbers_of_img][128*64]={0};
 int hex_dig[Numbers_of_img][1024]={0};
 unsigned char gray;
@@ -49,19 +49,16 @@ int CAP_FPS;
 int GRAY_DEAL(void)
 {
     VideoCapture cap;
-    cap.open("./a.gif");
+//    cap.open("1629390633805677.mp4");
+//    cap.open("1.gif");
+//    cap.open("a.gif");
+    cap.open(0);
     if(!cap.isOpened())
     {
         cout<<"film open failed!\n";
         getchar();
         return 0;
     }
-    /* acquir flim imformation */
-    /*
-    CAP_WIDTH = cap.get(CV_CAP_PROP_FRAME_WIDTH);
-    CAP_HEIGHT = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-    CAP_FPS = cap.get(CAP_PROP_FPS);
-    */
 
     Mat img;
     int frames = Numbers_of_img;
@@ -73,21 +70,27 @@ int GRAY_DEAL(void)
             static int frame_ct = 0;
             static int picture_ct = frames+1;
             int axis_x,axis_y;
+            cvtColor(img, img, COLOR_RGB2GRAY);
             resize(img,img,Size(128,64),0,0,INTER_LINEAR);
-            for(axis_x=0;axis_x<128;axis_x++)
-                for(axis_y=0;axis_y<64;axis_y++)
-                    {
-                        gray = (img.at<Vec3b>(Point(axis_x,axis_y))[0] + img.at<Vec3b>(Point(axis_x,axis_y))[1] + img.at<Vec3b>(Point(axis_x,axis_y))[2])/3;
-                        gray = (gray>127?255:0);
-                        img.at<Vec3b>(Point(axis_x,axis_y))[0] = gray;
-					    img.at<Vec3b>(Point(axis_x,axis_y))[1] = gray;
-					    img.at<Vec3b>(Point(axis_x,axis_y))[2] = gray;
-                    }
+//            resize(img,img,Size(1280,640),0,0,INTER_LINEAR);
+//            threshold(img, img, 0, 255,  THRESH_TRIANGLE);
+//            adaptiveThreshold(img, img,255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY,251,10);
+            adaptiveThreshold(img, img, 255, ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY,25,10);
+//            resize(img,img,Size(1280,640),0,0,INTER_LINEAR);
+//            for(axis_x=0;axis_x<1280;axis_x++)
+//                for(axis_y=0;axis_y<640;axis_y++)
+//                    {
+//                        gray = (img.at<Vec3b>(Point(axis_x,axis_y))[0] + img.at<Vec3b>(Point(axis_x,axis_y))[1] + img.at<Vec3b>(Point(axis_x,axis_y))[2])/3;
+//                        gray = (gray>127?255:0);
+//                        img.at<Vec3b>(Point(axis_x,axis_y))[0] = gray;
+//					    img.at<Vec3b>(Point(axis_x,axis_y))[1] = gray;
+//					    img.at<Vec3b>(Point(axis_x,axis_y))[2] = gray;
+//                    }
             imshow("gif",img);
-            sprintf(gif,"%s%d%s","./CV_OUT/",frame_ct,"_gif.bmp");
-            resize(img,img,Size(64,64),0,0,INTER_LINEAR);
-            Acquire_pot(frames,picture_ct,img);
-            imwrite(gif,img);
+//            sprintf(gif,"%s%d%s","./out/",frame_ct,"_gif.bmp");
+//            resize(img,img,Size(128,64),0,0,INTER_LINEAR);
+//            Acquire_pot(frames,picture_ct,img);
+//            imwrite(gif,img);
             waitKey((1/cap.get(CAP_PROP_FPS))*1000);
             frame_ct++;
         }
